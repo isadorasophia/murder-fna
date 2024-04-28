@@ -1,7 +1,6 @@
-This is FNA, an XNA4 reimplementation that focuses solely on developing a fully
-accurate XNA4 runtime for the desktop.
+This is a fork of FNA as part of the Murder Engine. FNA is an XNA4 reimplementation that focuses solely on developing a fully accurate XNA4 runtime for the desktop.
 
-Project Website: https://fna-xna.github.io/
+See https://fna-xna.github.io/ for more details about FNA! 
 
 License
 -------
@@ -15,12 +14,13 @@ See monoxna.LICENSE for details.
 
 Documentation
 -------------
-Documentation for FNA can be found on the FNA wiki:
+Documentation for FNA and Murder Engine can be found at:
 
 https://github.com/FNA-XNA/FNA/wiki
+https://isadorasophia.com/murder/
 
 Found an issue?
 ---------------
-Issues and patches can be reported via GitHub:
+Issues and patches are encouraged to be reported via the FNA GitHub:
 
 https://github.com/FNA-XNA/FNA/issues

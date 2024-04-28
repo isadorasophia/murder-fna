@@ -27,15 +27,15 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
 
-    <Description>Fork of FNA, an accuracy-focused XNA4 reimplementation for open platforms.</Description>
+    <Description>Fork of FNA for Murder Engine.</Description>
 
     <PackageId>Murder.FNA</PackageId>
-    <Authors>Murder Authors</Authors>
+    <Authors>Murder Engine Authors</Authors>
     <Company>Murder Engine</Company>
     <PackageVersion>24.04</PackageVersion>
 
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageReadmeFile>README</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -50,7 +50,7 @@
 
   <ItemGroup>
     <None Include="App.config" Pack="true" PackagePath="contentFiles\FNA.dll.config" />
-    <None Include="README" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="README.md" Pack="true" PackagePath="\" Visible="false" />
 
     <None Include="nuget\FNA.props" Pack="true" PackagePath="buildTransitive\FNA.props" Visible="false" />
     <None Include="nuget\LICENSE.txt" Pack="true" PackagePath="\LICENSE.txt" Visible="false" />
