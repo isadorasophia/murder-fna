@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
-		<TargetFrameworks>net7.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 	</PropertyGroup>
+
 	<PropertyGroup>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<AssemblyName>FNA</AssemblyName>
@@ -9,15 +11,80 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
+
 	<PropertyGroup>
 		<FNASettingsPropsFilePath>$(SolutionDir)FNA.Settings.props</FNASettingsPropsFilePath>
 	</PropertyGroup>
+
 	<Import Project="$(FNASettingsPropsFilePath)" Condition="Exists('$(FNASettingsPropsFilePath)')" />
+
 	<Target Name="ValidatePropsFilePath" BeforeTargets="BeforeBuild">
 		<Message Importance="High" Text="No property overrides found at '$(FNASettingsPropsFilePath)'" Condition="!Exists('$(FNASettingsPropsFilePath)')" />
 		<Message Importance="High" Text="Loaded property overrides from '$(FNASettingsPropsFilePath)'" Condition="Exists('$(FNASettingsPropsFilePath)')" />
 	</Target>
-	<ItemGroup>
+
+  <!-- Nuget package settings! -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+
+    <Description>Fork of FNA, an accuracy-focused XNA4 reimplementation for open platforms.</Description>
+
+    <PackageId>Murder.FNA</PackageId>
+    <Authors>Murder Authors</Authors>
+    <Company>Murder Engine</Company>
+
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReadmeFile>README</PackageReadmeFile>
+
+    <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="App.config" Pack="true" PackagePath="contentFiles\FNA.dll.config" />
+    <None Include="README" Pack="true" PackagePath="\" Visible="false" />
+
+    <None Include="nuget\FNA.props" Pack="true" PackagePath="buildTransitive\FNA.props" Visible="false" />
+    <None Include="nuget\LICENSE.txt" Pack="true" PackagePath="\LICENSE.txt" Visible="false" />
+
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="DownloadExpandAndPackFNALibs" BeforeTargets="DispatchToInnerBuilds" Condition="'$(PackFNALibs)' == true">
+
+    <PropertyGroup>
+      <FNALibsRoot>$(BaseIntermediateOutputPath)fnalibs\</FNALibsRoot>
+    </PropertyGroup>
+
+    <!-- Download binaries... -->
+    <DownloadFile SourceUrl="https://fna.flibitijibibo.com/archive/fnalibs.tar.bz2" DestinationFolder="$(BaseIntermediateOutputPath)">
+      <Output TaskParameter="DownloadedFile" PropertyName="FNALibsArchive" />
+    </DownloadFile>
+
+    <MakeDir Directories="$(FNALibsRoot)" />
+
+    <Exec Condition="'$(OS)' == 'Windows_NT'" Command=" tar -xvzf $(FNALibsArchive) -C $(FNALibsRoot)" />
+    <Exec Condition="'$(OS)' == 'Linux'" Command="bsdtar -xjf $(FNALibsArchive) -C $(FNALibsRoot)" />
+
+    <ItemGroup>
+      <None Include="$(FNALibsRoot)x64\*.*" Pack="true" PackagePath="runtimes\win-x64\native" />
+      <None Include="$(FNALibsRoot)x86\*.*" Pack="true" PackagePath="runtimes\win-x86\native" />
+      <None Include="$(FNALibsRoot)osx\*.*" Pack="true" PackagePath="runtimes\osx-x64\native" />
+      <None Include="$(FNALibsRoot)lib64\*.*" Pack="true" PackagePath="runtimes\linux-x64\native" />
+      <None Include="$(FNALibsRoot)libaarch64\*.*" Pack="true" PackagePath="runtimes\linux-arm64\native" />
+    </ItemGroup>
+
+  </Target>
+  <!-- End of nuget package settings! -->
+
+  <ItemGroup>
 		<Compile Include="src\Audio\AudioCategory.cs" />
 		<Compile Include="src\Audio\AudioChannels.cs" />
 		<Compile Include="src\Audio\AudioEmitter.cs" />

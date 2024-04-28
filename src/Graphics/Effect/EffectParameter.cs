@@ -497,6 +497,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 		}
 
+		public Vector2[] GetValueVector2Array() => GetValueVector2Array(this.elementCount);
+
 		public Vector2[] GetValueVector2Array(int count)
 		{
 			Vector2[] result = new Vector2[count];
@@ -522,6 +524,8 @@ namespace Microsoft.Xna.Framework.Graphics
 				return new Vector3(resPtr[0], resPtr[1], resPtr[2]);
 			}
 		}
+
+		public Vector3[] GetValueVector3Array() => GetValueVector3Array(this.elementCount);
 
 		public Vector3[] GetValueVector3Array(int count)
 		{

@@ -26,7 +26,7 @@ namespace Microsoft.Xna.Framework
 	{
 		#region Private Static Variables
 
-		private static Dictionary<string, string> mapDictionary
+		private readonly static Dictionary<string, string> mapDictionary
 			= new Dictionary<string, string>();
 
 		#endregion
@@ -88,7 +88,9 @@ namespace Microsoft.Xna.Framework
 
 		#region Module Initializer
 
+#pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
 		[ModuleInitializer]
+#pragma warning restore CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
 		public static void Init()
 		{
 			if (!RuntimeFeature.IsDynamicCodeCompiled)
