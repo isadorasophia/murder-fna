@@ -2,15 +2,12 @@ This is a fork of FNA as part of the Murder Engine. FNA is an XNA4 reimplementat
 
 See https://fna-xna.github.io/ for more details about FNA! 
 
-🔨 Manual steps for updating nuget package (for now) [![NuGet version (24.4.2)](https://img.shields.io/nuget/v/Murder.FNA.svg?style=flat-square)](https://www.nuget.org/packages/Murder.FNA/)
+🔨 Manual steps for updating nuget package (for now)
 -------
 1. Run `nuget\update_libs.ps1`
 2. Build arm64 binaries with [fnalibs-apple-builder](https://github.com/TheSpydog/fnalibs-apple-builder) and place them in `packages\osx-arm64`
 3. Run `dotnet pack ./FNA.Core.csproj -c Release -p:ContinuousIntegrationBuild=true -p:PackFNALibs=true`
-4. Manually upload at nuget!
-
-
-
+4. Manually upload at [nuget](https://www.nuget.org/packages/Murder.FNA/)!
 
 💼 License
 -------
