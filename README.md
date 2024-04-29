@@ -23,7 +23,7 @@ See monoxna.LICENSE for details.
 -------------
 Documentation for FNA and Murder Engine can be found at:
 
-https://github.com/FNA-XNA/FNA/wiki
+https://github.com/FNA-XNA/FNA/wiki<br>
 https://isadorasophia.com/murder/
 
 🐛 Found an issue?
