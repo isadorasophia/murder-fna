@@ -1,0 +1,3 @@
+The osx-arm64 binaries are not officially supported by FNA so I ship them myself.
+
+I basically ran the scripts at: https://github.com/TheSpydog/fnalibs-apple-builder
