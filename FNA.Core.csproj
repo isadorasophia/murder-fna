@@ -32,7 +32,7 @@
     <PackageId>Murder.FNA</PackageId>
     <Authors>Murder Engine Authors</Authors>
     <Company>Murder Engine</Company>
-    <PackageVersion>24.04</PackageVersion>
+    <PackageVersion>24.04.02</PackageVersion>
 
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -61,23 +61,14 @@
   <Target Name="DownloadExpandAndPackFNALibs" BeforeTargets="DispatchToInnerBuilds" Condition="'$(PackFNALibs)' == true">
 
     <PropertyGroup>
-      <FNALibsRoot>$(BaseIntermediateOutputPath)fnalibs\</FNALibsRoot>
+      <FNALibsRoot>fnalibs\</FNALibsRoot>
     </PropertyGroup>
-
-    <!-- Download binaries... -->
-    <DownloadFile SourceUrl="https://fna.flibitijibibo.com/archive/fnalibs.tar.bz2" DestinationFolder="$(BaseIntermediateOutputPath)">
-      <Output TaskParameter="DownloadedFile" PropertyName="FNALibsArchive" />
-    </DownloadFile>
-
-    <MakeDir Directories="$(FNALibsRoot)" />
-
-    <Exec Condition="'$(OS)' == 'Windows_NT'" Command=" tar -xvzf $(FNALibsArchive) -C $(FNALibsRoot)" />
-    <Exec Condition="'$(OS)' == 'Linux'" Command="bsdtar -xjf $(FNALibsArchive) -C $(FNALibsRoot)" />
 
     <ItemGroup>
       <None Include="$(FNALibsRoot)x64\*.*" Pack="true" PackagePath="runtimes\win-x64\native" />
       <None Include="$(FNALibsRoot)x86\*.*" Pack="true" PackagePath="runtimes\win-x86\native" />
-      <None Include="$(FNALibsRoot)osx\*.*" Pack="true" PackagePath="runtimes\osx-x64\native" />
+      <None Include="$(FNALibsRoot)osx-x64\*.*" Pack="true" PackagePath="runtimes\osx-x64\native" />
+      <None Include="$(FNALibsRoot)osx-arm64\*.*" Pack="true" PackagePath="runtimes\osx-arm64\native" />
       <None Include="$(FNALibsRoot)lib64\*.*" Pack="true" PackagePath="runtimes\linux-x64\native" />
       <None Include="$(FNALibsRoot)libaarch64\*.*" Pack="true" PackagePath="runtimes\linux-arm64\native" />
     </ItemGroup>
