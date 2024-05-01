@@ -32,7 +32,7 @@
     <PackageId>Murder.FNA</PackageId>
     <Authors>Murder Engine Authors</Authors>
     <Company>Murder Engine</Company>
-    <PackageVersion>24.04.02</PackageVersion>
+    <PackageVersion>24.04.03</PackageVersion>
 
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>

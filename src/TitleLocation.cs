@@ -13,7 +13,7 @@ using System;
 
 namespace Microsoft.Xna.Framework
 {
-	internal static class TitleLocation
+	public static class TitleLocation
 	{
 		#region Public Static Properties
 
