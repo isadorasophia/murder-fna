@@ -1,13 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Microsoft.Xna.Framework.src.Input
+namespace Microsoft.Xna.Framework.Input
 {
 	public static class FileDropEXT
 	{
-		public static Action<string> DropFile;
+		/// <summary>
+		/// Use this event to receive notifications on files dropped on window.
+		/// </summary>
+		public static event Action<string> DropFile;
+
+		#region Internal Event Access Method
+
+		internal static void OnDropFile(string path)
+		{
+			if (DropFile != null)
+			{
+				DropFile(path);
+			}
+		}
+
+		#endregion
 	}
 }

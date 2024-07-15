@@ -20,7 +20,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.src.Input;
 #endregion
 
 namespace Microsoft.Xna.Framework
@@ -1255,7 +1254,7 @@ namespace Microsoft.Xna.Framework
 				// Drop File
 				else if (evt.type == SDL.SDL_EventType.SDL_DROPFILE)
 				{
-					FileDropEXT.DropFile(SDL.UTF8_ToManaged(evt.drop.file, true));
+					FileDropEXT.OnDropFile(SDL.UTF8_ToManaged(evt.drop.file, freePtr: true));
 				}
 
 				// Quit

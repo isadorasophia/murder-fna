@@ -997,11 +997,6 @@ namespace Microsoft.Xna.Framework
 			ShowMissingRequirementMessage(args.ExceptionObject as Exception);
 		}
 
-		internal void DropFile(nint file)
-		{
-			throw new NotImplementedException();
-		}
-
 		#endregion
 	}
 }
