@@ -401,6 +401,9 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Private Member Data: Theorafile
 
+		private IntPtr theora;
+		private double fps;
+
 		private IntPtr yuvData;
 		private int yuvDataLen;
 		private int currentFrame;
@@ -503,6 +506,11 @@ namespace Microsoft.Xna.Framework.Media
 				yuvData = IntPtr.Zero;
 			}
 
+			if (theora != IntPtr.Zero)
+			{
+				Theorafile.tf_close(ref theora);
+			}
+
 			// Okay, we out.
 			IsDisposed = true;
 		}
@@ -518,19 +526,19 @@ namespace Microsoft.Xna.Framework.Media
 
 			// Be sure we can even get something from Theorafile...
 			if (	State == MediaState.Stopped ||
-				Video.theora == IntPtr.Zero ||
-				Theorafile.tf_hasvideo(Video.theora) == 0	)
+				theora == IntPtr.Zero ||
+				Theorafile.tf_hasvideo(theora) == 0	)
 			{
 				 // Screw it, give them the old one.
 				return videoTexture[0].RenderTarget as Texture2D;
 			}
 
-			int thisFrame = (int) (timer.Elapsed.TotalMilliseconds / (1000.0 / Video.fps));
+			int thisFrame = (int) (timer.Elapsed.TotalMilliseconds / (1000.0 / fps));
 			if (thisFrame > currentFrame)
 			{
 				// Only update the textures if we need to!
 				if (Theorafile.tf_readvideo(
-					Video.theora,
+					theora,
 					yuvData,
 					thisFrame - currentFrame
 				) == 1 || currentFrame == -1) {
@@ -540,7 +548,7 @@ namespace Microsoft.Xna.Framework.Media
 			}
 
 			// Check for the end...
-			bool ended = Theorafile.tf_eos(Video.theora) == 1;
+			bool ended = Theorafile.tf_eos(theora) == 1;
 			if (audioStream != null)
 			{
 				ended &= audioStream.PendingBufferCount == 0;
@@ -566,7 +574,7 @@ namespace Microsoft.Xna.Framework.Media
 				}
 
 				// Reset the stream no matter what happens next
-				Theorafile.tf_reset(Video.theora);
+				Theorafile.tf_reset(theora);
 
 				// If looping, go back to the start. Otherwise, we'll be exiting.
 				if (IsLooped)
@@ -598,11 +606,86 @@ namespace Microsoft.Xna.Framework.Media
 
 			// We need to assign this regardless of what happens next.
 			Video = video;
+			Video.parent = this; // FIXME: Remove this when extension is replaced!!!
+
+			// Again, no matter what happens this should be cleared!
+			if (theora != IntPtr.Zero)
+			{
+				Theorafile.tf_close(ref theora);
+				theora = IntPtr.Zero;
+			}
 
 			// FIXME: This is a part of the Duration hack!
 			if (Video.needsDurationHack)
 			{
 				Video.Duration = TimeSpan.MaxValue;
+			}
+
+			Theorafile.th_pixel_fmt fmt;
+			int yWidth;
+			int yHeight;
+			int uvWidth;
+			int uvHeight;
+
+			Theorafile.tf_fopen(Video.handle, out theora);
+			if (theora == IntPtr.Zero)
+			{
+				throw new System.IO.FileNotFoundException(Video.handle);
+			}
+			Theorafile.tf_videoinfo(
+				theora,
+				out yWidth,
+				out yHeight,
+				out fps,
+				out fmt
+			);
+			if (fmt == Theorafile.th_pixel_fmt.TH_PF_420)
+			{
+				uvWidth = yWidth / 2;
+				uvHeight = yHeight / 2;
+			}
+			else if (fmt == Theorafile.th_pixel_fmt.TH_PF_422)
+			{
+				uvWidth = yWidth / 2;
+				uvHeight = yHeight;
+			}
+			else if (fmt == Theorafile.th_pixel_fmt.TH_PF_444)
+			{
+				uvWidth = yWidth;
+				uvHeight = yHeight;
+			}
+			else
+			{
+				throw new NotSupportedException(
+					"Unrecognized YUV format!"
+				);
+			}
+
+			// Sanity checks for video metadata
+			if (Video.Width != yWidth || Video.Height != yHeight)
+			{
+				throw new InvalidOperationException(
+					"XNB/OGV width/height mismatch!" +
+					" Width: " + Video.Width.ToString() +
+					" Height: " + Video.Height.ToString()
+				);
+			}
+			if (Math.Abs(Video.FramesPerSecond - fps) >= 1.0f)
+			{
+				throw new InvalidOperationException(
+					"XNB/OGV framesPerSecond mismatch!" +
+					" FPS: " + Video.FramesPerSecond.ToString()
+				);
+			}
+
+			// Per-video track settings should always take priority
+			if (Video.audioTrack >= 0)
+			{
+				SetAudioTrackEXT(Video.audioTrack);
+			}
+			if (Video.videoTrack >= 0)
+			{
+				SetVideoTrackEXT(Video.videoTrack);
 			}
 
 			// Check the player state before attempting anything.
@@ -620,8 +703,8 @@ namespace Microsoft.Xna.Framework.Media
 				FNAPlatform.Free(yuvData);
 			}
 			yuvDataLen = (
-				(Video.yWidth * Video.yHeight) +
-				(Video.uvWidth * Video.uvHeight * 2)
+				(yWidth * yHeight) +
+				(uvWidth * uvHeight * 2)
 			);
 			yuvData = FNAPlatform.Malloc(yuvDataLen);
 
@@ -629,7 +712,7 @@ namespace Microsoft.Xna.Framework.Media
 			InitializeTheoraStream();
 
 			// Set up the texture data
-			if (Theorafile.tf_hasvideo(Video.theora) == 1)
+			if (Theorafile.tf_hasvideo(theora) == 1)
 			{
 				// The VideoPlayer will use the GraphicsDevice that is set now.
 				if (currentDevice != Video.GraphicsDevice)
@@ -643,8 +726,8 @@ namespace Microsoft.Xna.Framework.Media
 				videoTexture[0] = new RenderTargetBinding(
 					new RenderTarget2D(
 						currentDevice,
-						Video.yWidth,
-						Video.yHeight,
+						yWidth,
+						yHeight,
 						false,
 						SurfaceFormat.Color,
 						DepthFormat.None,
@@ -657,10 +740,10 @@ namespace Microsoft.Xna.Framework.Media
 					overlap.RenderTarget.Dispose();
 				}
 				GL_setupTextures(
-					Video.yWidth,
-					Video.yHeight,
-					Video.uvWidth,
-					Video.uvHeight
+					yWidth,
+					yHeight,
+					uvWidth,
+					uvHeight
 				);
 			}
 
@@ -694,7 +777,7 @@ namespace Microsoft.Xna.Framework.Media
 				audioStream.Dispose();
 				audioStream = null;
 			}
-			Theorafile.tf_reset(Video.theora);
+			Theorafile.tf_reset(theora);
 		}
 
 		public void Pause()
@@ -741,12 +824,34 @@ namespace Microsoft.Xna.Framework.Media
 
 		#endregion
 
+		#region Public Extensions
+
+		// FIXME: Maybe store these to carry over to future videos?
+
+		public void SetAudioTrackEXT(int track)
+		{
+			if (theora != IntPtr.Zero)
+			{
+				Theorafile.tf_setaudiotrack(theora, track);
+			}
+		}
+
+		public void SetVideoTrackEXT(int track)
+		{
+			if (theora != IntPtr.Zero)
+			{
+				Theorafile.tf_setvideotrack(theora, track);
+			}
+		}
+
+		#endregion
+
 		#region Private Theora Audio Stream Methods
 
 		private void OnBufferRequest(object sender, EventArgs args)
 		{
 			int samples = Theorafile.tf_readaudio(
-				Video.theora,
+				theora,
 				audioDataPtr,
 				AUDIO_BUFFER_SIZE
 			);
@@ -758,7 +863,7 @@ namespace Microsoft.Xna.Framework.Media
 					samples
 				);
 			}
-			else if (Theorafile.tf_eos(Video.theora) == 1)
+			else if (Theorafile.tf_eos(theora) == 1)
 			{
 				// Okay, we ran out. No need for this!
 				audioStream.BufferNeeded -= OnBufferRequest;
@@ -777,10 +882,10 @@ namespace Microsoft.Xna.Framework.Media
 				yuvTextures[0].texture,
 				yuvTextures[1].texture,
 				yuvTextures[2].texture,
-				Video.yWidth,
-				Video.yHeight,
-				Video.uvWidth,
-				Video.uvHeight,
+				yuvTextures[0].Width,
+				yuvTextures[0].Height,
+				yuvTextures[1].Width,
+				yuvTextures[1].Height,
 				yuvData,
 				yuvDataLen
 			);
@@ -802,13 +907,13 @@ namespace Microsoft.Xna.Framework.Media
 		private void InitializeTheoraStream()
 		{
 			// Grab the first video frame ASAP.
-			while (Theorafile.tf_readvideo(Video.theora, yuvData, 1) == 0);
+			while (Theorafile.tf_readvideo(theora, yuvData, 1) == 0);
 
 			// Grab the first bit of audio. We're trying to start the decoding ASAP.
-			if (Theorafile.tf_hasaudio(Video.theora) == 1)
+			if (Theorafile.tf_hasaudio(theora) == 1)
 			{
 				int channels, samplerate;
-				Theorafile.tf_audioinfo(Video.theora, out channels, out samplerate);
+				Theorafile.tf_audioinfo(theora, out channels, out samplerate);
 				audioStream = new DynamicSoundEffectInstance(
 					samplerate,
 					(AudioChannels) channels

@@ -121,6 +121,7 @@ SRC = \
 	src/FNAPlatform/FNAPlatform.cs \
 	src/FNAPlatform/FNAWindow.cs \
 	src/FNAPlatform/SDL2_FNAPlatform.cs \
+	src/FNAPlatform/SDL3_FNAPlatform.cs \
 	src/FrameworkDispatcher.cs \
 	src/Game.cs \
 	src/GameComponent.cs \
@@ -321,6 +322,7 @@ SRC = \
 	src/Vector3.cs \
 	src/Vector4.cs \
 	lib/SDL2-CS/src/SDL2.cs \
+	lib/SDL3-CS/SDL3/SDL3.Legacy.cs \
 	lib/FAudio/csharp/FAudio.cs \
 	lib/Theorafile/csharp/Theorafile.cs
 
@@ -340,7 +342,7 @@ RES = \
 debug: clean-debug
 	mkdir -p bin/Debug
 	cp app.config bin/Debug/FNA.dll.config
-	mcs /unsafe -debug -define:DEBUG -out:bin/Debug/FNA.dll -target:library $(SRC) $(RES)
+	mcs /unsafe /langversion:4 -debug -define:DEBUG -out:bin/Debug/FNA.dll -target:library $(SRC) $(RES)
 
 clean-debug:
 	rm -rf bin/Debug
@@ -348,7 +350,7 @@ clean-debug:
 release: clean-release
 	mkdir -p bin/Release
 	cp app.config bin/Release/FNA.dll.config
-	mcs /unsafe -optimize -out:bin/Release/FNA.dll -target:library $(SRC) $(RES)
+	mcs /unsafe /langversion:4 -optimize -out:bin/Release/FNA.dll -target:library $(SRC) $(RES)
 
 clean-release:
 	rm -rf bin/Release

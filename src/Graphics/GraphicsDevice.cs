@@ -582,6 +582,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		#endregion
 
+		#region Internal Adapter Updates
+
+		/* This exists because display hotplugging is fragile and can
+		 * cause problems if we try to do a hard Reset(). Even after
+		 * refreshing the static Adapters list you find weird cases
+		 * where a reset on an unrelated display will insist on a 0x0
+		 * window size??? :psyduck:
+		 *
+		 * So instead, just quietly swap the Adapter so that the device
+		 * state is valid, and avoid messing with the window further.
+		 * -flibit
+		 */
+
+		internal void QuietlyUpdateAdapter(GraphicsAdapter adapter)
+		{
+			Adapter = adapter;
+		}
+
+		#endregion
+
 		#region Public Present Method
 
 		public void Present()
@@ -889,6 +909,14 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void SetRenderTargets(params RenderTargetBinding[] renderTargets)
 		{
+			// Flush scissor state - using a rect outside of the viewport has been observed
+			// causing errors in Metal on iOS (via SDLGPU), for example when scissoring was just
+			// disabled and we're changing viewport size.
+			FNA3D.FNA3D_ApplyRasterizerState(
+				GLDevice,
+				ref RasterizerState.state
+			);
+
 			// D3D11 requires our sampler state to be valid (i.e. not point to any of our new RTs)
 			//  before we call SetRenderTargets. At this point FNA3D does not have a current copy
 			//  of the managed sampler state, so we need to apply our current state now instead of
@@ -1032,7 +1060,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				return renderTargetCount;
 			}
-			else if (output.Length != renderTargetCount)
+			else if (output.Length < renderTargetCount)
 			{
 				throw new ArgumentException("Output buffer size incorrect");
 			}
