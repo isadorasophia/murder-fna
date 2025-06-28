@@ -1,21 +1,18 @@
-This is fnalibs, an archive containing the native libraries used by FNA.
+This is fnalibs-apple, an archive containing the native libraries used by FNA
+to target Apple platforms.
 
 These are the folders included:
 
-- x86: 32-bit Windows
-- x64: 64-bit Windows
-- lib64: Linux (64-bit only)
-- libaarch64: Linux (64-bit ARM only)
-- osx: macOS (64-bit only)
-- vulkan: MoltenVK ICD for macOS
-	- Place this at Game.app/Contents/Resources/vulkan/
+- osx: macOS Universal dynamic libraries, requires version 10.11 or newer
+- iphoneos: iOS static libraries, requires version 13 or newer
+- appletvos: tvOS static libraries, requires version 13 or newer
+
+Libraries for the simulators are not provided.
 
 The library dependency list is as follows:
 
-- SDL2, used as the platform layer
+- SDL3, used as the platform layer
 - FNA3D, used in the Graphics namespace
+    - For static libraries, mojoshader.a is used by libFNA3D.a
 - FAudio, used in the Audio/Media namespaces
 - libtheorafile, only used for VideoPlayer
-
-For x86_64 Linux, the minimum OS requirement is glibc 2.28.
-For aarch64 Linux, the minimum OS requirement is glibc 2.34.
