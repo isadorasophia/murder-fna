@@ -26,8 +26,6 @@ Rename-Item -Path "${fnalibsPath}/libaarch64/libFAudio.so.0" -NewName libFAudio.
 Rename-Item -Path "${fnalibsPath}/libaarch64/libFNA3D.so.0" -NewName libFNA3D.so
 Rename-Item -Path "${fnalibsPath}/libaarch64/libSDL3.so.0" -NewName libSDL3.so
 
-Rename-Item -Path "${fnalibsPath}/osx" -NewName osx-x64
-
-Rename-Item -Path "${fnalibsPath}/osx-x64/libFAudio.0.dylib" -NewName libFAudio.dylib
-Rename-Item -Path "${fnalibsPath}/osx-x64/libFNA3D.0.dylib" -NewName libFNA3D.dylib
-Rename-Item -Path "${fnalibsPath}/osx-x64/libSDL3.0.dylib" -NewName libSDL3.dylib
+Rename-Item -Path "${fnalibsPath}/osx/libFAudio.0.dylib" -NewName libFAudio.dylib
+Rename-Item -Path "${fnalibsPath}/osx/libFNA3D.0.dylib" -NewName libFNA3D.dylib
+Rename-Item -Path "${fnalibsPath}/osx/libSDL3.0.dylib" -NewName libSDL3.dylib
