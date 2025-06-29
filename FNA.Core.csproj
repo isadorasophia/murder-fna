@@ -33,7 +33,7 @@
     <PackageId>Murder.FNA</PackageId>
     <Authors>Murder Engine Authors</Authors>
     <Company>Murder Engine</Company>
-    <PackageVersion>24.06.2</PackageVersion>
+    <PackageVersion>25.06</PackageVersion>
 
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -47,6 +47,8 @@
     <!-- Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <FNALibsRoot>packages\fnalibs\</FNALibsRoot>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,27 +59,14 @@
     <None Include="nuget\LICENSE.txt" Pack="true" PackagePath="\LICENSE.txt" Visible="false" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+	  
+    <None Include="$(FNALibsRoot)x64\*.*" Pack="true" PackagePath="runtimes\win-x64\native" />
+    <None Include="$(FNALibsRoot)x86\*.*" Pack="true" PackagePath="runtimes\win-x86\native" />
+    <None Include="$(FNALibsRoot)osx\*.*" Pack="true" PackagePath="runtimes\osx\native" />
+    <None Include="$(FNALibsRoot)lib64\*.*" Pack="true" PackagePath="runtimes\linux-x64\native" />
+    <None Include="$(FNALibsRoot)libaarch64\*.*" Pack="true" PackagePath="runtimes\linux-arm64\native" />
   </ItemGroup>
 
-  <Target Name="DownloadExpandAndPackFNALibs" BeforeTargets="DispatchToInnerBuilds" Condition="'$(PackFNALibs)' == true">
-
-    <PropertyGroup>
-      <FNALibsRoot>packages\fnalibs\</FNALibsRoot>
-      
-      <!-- Not shipped with fnalibs. -->
-      <OsxArm64LibsRoot>packages\osx-arm64\</OsxArm64LibsRoot>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <None Include="$(FNALibsRoot)x64\*.*" Pack="true" PackagePath="runtimes\win-x64\native" />
-      <None Include="$(FNALibsRoot)x86\*.*" Pack="true" PackagePath="runtimes\win-x86\native" />
-      <None Include="$(FNALibsRoot)osx-x64\*.*" Pack="true" PackagePath="runtimes\osx-x64\native" />
-      <None Include="$(OsxArm64LibsRoot)*.*" Pack="true" PackagePath="runtimes\osx-arm64\native" />
-      <None Include="$(FNALibsRoot)lib64\*.*" Pack="true" PackagePath="runtimes\linux-x64\native" />
-      <None Include="$(FNALibsRoot)libaarch64\*.*" Pack="true" PackagePath="runtimes\linux-arm64\native" />
-    </ItemGroup>
-
-  </Target>
   <!-- End of nuget package settings! -->
 
   <ItemGroup>
