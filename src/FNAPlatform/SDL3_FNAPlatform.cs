@@ -8,18 +8,18 @@
 #endregion
 
 #region Using Statements
-using System;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-
-using SDL3;
-
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using SDL3;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+
 #endregion
 
 namespace Microsoft.Xna.Framework
@@ -1137,6 +1137,25 @@ namespace Microsoft.Xna.Framework
 					else
 					{
 						TextInputEXT.OnTextEditing(null, 0, 0);
+					}
+				}
+
+				// Drop File
+				else if (evt.type == (uint)SDL.SDL_EventType.SDL_EVENT_DROP_FILE)
+				{
+					int bytes = MeasureStringLength(evt.drop.data);
+					if (bytes > 0)
+					{
+						/* UTF8 will never encode more characters
+						 * than bytes in a string, so bytes is a
+						 * suitable upper estimate of size needed
+						 */
+						string file = Encoding.UTF8.GetString(
+							evt.drop.data,
+							bytes
+						);
+
+						FileDropEXT.OnDropFile(file);
 					}
 				}
 
