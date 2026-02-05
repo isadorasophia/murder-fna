@@ -92,6 +92,13 @@ namespace Microsoft.Xna.Framework
 					"1"
 				);
 			}
+			if (args.TryGetValue("disableglobalmouse", out arg) && arg == "1")
+			{
+				Environment.SetEnvironmentVariable(
+					"FNA_MOUSE_DISABLE_GLOBAL_ACCESS",
+					"1"
+				);
+			}
 			if (args.TryGetValue("nukesteaminput", out arg) && arg == "1")
 			{
 				Environment.SetEnvironmentVariable(
@@ -126,6 +133,7 @@ namespace Microsoft.Xna.Framework
 				PollEvents =			SDL3_FNAPlatform.PollEvents;
 				GetGraphicsAdapters =		SDL3_FNAPlatform.GetGraphicsAdapters;
 				GetCurrentDisplayMode =		SDL3_FNAPlatform.GetCurrentDisplayMode;
+				GetMonitorHandle =		SDL3_FNAPlatform.GetMonitorHandle;
 				GetKeyFromScancode =		SDL3_FNAPlatform.GetKeyFromScancode;
 				IsTextInputActive =		SDL3_FNAPlatform.IsTextInputActive;
 				StartTextInput =		SDL3_FNAPlatform.StartTextInput;
@@ -181,6 +189,7 @@ namespace Microsoft.Xna.Framework
 				PollEvents =			SDL2_FNAPlatform.PollEvents;
 				GetGraphicsAdapters =		SDL2_FNAPlatform.GetGraphicsAdapters;
 				GetCurrentDisplayMode =		SDL2_FNAPlatform.GetCurrentDisplayMode;
+				GetMonitorHandle =		SDL2_FNAPlatform.GetMonitorHandle;
 				GetKeyFromScancode =		SDL2_FNAPlatform.GetKeyFromScancode;
 				IsTextInputActive =		SDL2_FNAPlatform.IsTextInputActive;
 				StartTextInput =		SDL2_FNAPlatform.StartTextInput;
@@ -339,6 +348,9 @@ namespace Microsoft.Xna.Framework
 
 		public delegate DisplayMode GetCurrentDisplayModeFunc(int adapterIndex);
 		public static readonly GetCurrentDisplayModeFunc GetCurrentDisplayMode;
+
+		public delegate IntPtr GetMonitorHandleFunc(int adapterIndex);
+		public static readonly GetMonitorHandleFunc GetMonitorHandle;
 
 		public delegate Keys GetKeyFromScancodeFunc(Keys scancode);
 		public static readonly GetKeyFromScancodeFunc GetKeyFromScancode;

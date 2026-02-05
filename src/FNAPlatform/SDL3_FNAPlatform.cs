@@ -183,7 +183,7 @@ namespace Microsoft.Xna.Framework
 			if (args.TryGetValue("audiodriver", out arg))
 			{
 				SDL.SDL_SetHintWithPriority(
-					"SDL_AUDIODRIVER",
+					"SDL_AUDIO_DRIVER",
 					arg,
 					SDL.SDL_HintPriority.SDL_HINT_OVERRIDE
 				);
@@ -207,6 +207,28 @@ namespace Microsoft.Xna.Framework
 			SupportsGlobalMouse = (	OSVersion.Equals("Windows") ||
 						OSVersion.Equals("macOS") ||
 						videoDriver.Equals("x11")	);
+			if (Environment.GetEnvironmentVariable("FNA_MOUSE_DISABLE_GLOBAL_ACCESS") == "1")
+			{
+				// Ignore previous instructions
+				SupportsGlobalMouse = false;
+			}
+
+			/* SDL3 added a helper to try and override constant warping
+			 * with emulation via relative mouse mode; this is nice
+			 * _sometimes_ and platforms without global mouse support need
+			 * this, but FNA has the burden of trying to be honest about app
+			 * requests to manipulate the cursor, so by default we'll gently
+			 * suggest the Old Way. Apps are more than welcome to override
+			 * this though.
+			 * -flibit
+			 */
+			if (SupportsGlobalMouse)
+			{
+				SDL.SDL_SetHint(
+					SDL.SDL_HINT_MOUSE_EMULATE_WARP_WITH_RELATIVE,
+					"0"
+				);
+			}
 
 			// Only iOS and Android care about device orientation.
 			SupportsOrientations = ( OSVersion.Equals("iOS") ||
@@ -980,9 +1002,13 @@ namespace Microsoft.Xna.Framework
 					// Window Resize
 					else if (evt.type == (uint) SDL.SDL_EventType.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED)
 					{
-						// This is called on both API and WM resizes
-						Mouse.INTERNAL_WindowWidth = evt.window.data1;
-						Mouse.INTERNAL_WindowHeight = evt.window.data2;
+						/* This is called on both API and WM resizes.
+						 * We have to use WindowBounds instead of data1/2,
+						 * since data1/2 are in pixels, not desktop units.
+						 */
+						Rectangle b = GetWindowBounds(Mouse.WindowHandle);
+						Mouse.INTERNAL_WindowWidth = b.Width;
+						Mouse.INTERNAL_WindowHeight = b.Height;
 					}
 					else if (evt.type == (uint) SDL.SDL_EventType.SDL_EVENT_WINDOW_RESIZED)
 					{
@@ -1321,6 +1347,11 @@ namespace Microsoft.Xna.Framework
 			);
 		}
 
+		public static IntPtr GetMonitorHandle(int adapterIndex)
+		{
+			return new IntPtr(unchecked((int)displayIds[adapterIndex]));
+		}
+
 		#endregion
 
 		#region Mouse Methods
@@ -1353,7 +1384,6 @@ namespace Microsoft.Xna.Framework
 			{
 				/* This is inaccurate, but what can you do... */
 				flags = SDL.SDL_GetMouseState(out fx, out fy);
-
 			}
 			// FIXME SDL3: Should this be rounded?
 			x = (int) fx;
