@@ -1,0 +1,15 @@
+<Project>
+<!-- Per fnalibs (https://github.com/FNA-XNA/fnalibs-dailies/blob/main/fnalibs.README) documentation,
+     we copy the contents of D3D12 over to the output next to the game executable. -->
+	<Target Name="CopyD3D12FilesOnx64"
+			AfterTargets="Build"
+			Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+		<Copy SourceFiles="$(MSBuildThisFileDirectory)..\tools\D3D12\D3D12Core.dll" DestinationFolder="$(OutDir)D3D12\" />
+	</Target>
+
+	<Target Name="CopyD3D12FilesOnx64"
+			AfterTargets="Publish"
+			Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+		<Copy SourceFiles="$(MSBuildThisFileDirectory)..\tools\D3D12\D3D12Core.dll" DestinationFolder="$(PublishDir)D3D12\" />
+	</Target>
+</Project>
